@@ -1,0 +1,8 @@
+<svg width="120" height="80" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="120" height="80" fill="#F3F4F6" rx="8"/>
+<circle cx="40" cy="40" r="15" fill="#2563EB"/>
+<rect x="60" y="25" width="40" height="8" fill="#2563EB" rx="4"/>
+<rect x="60" y="40" width="30" height="6" fill="#64748B" rx="3"/>
+<rect x="60" y="52" width="35" height="6" fill="#64748B" rx="3"/>
+<text x="60" y="70" font-family="Arial" font-size="8" fill="#4B5C68">LOGO EMPRESA</text>
+</svg>
