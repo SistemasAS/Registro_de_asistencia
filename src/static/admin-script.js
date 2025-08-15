@@ -44,10 +44,14 @@ const adminElements = {
     configForm: document.getElementById('configForm'),
     saveConfigBtn: document.getElementById('saveConfigBtn'),
     configNombreCapacitacion: document.getElementById('configNombreCapacitacion'),
-    configEmpresaCapacitadora: document.getElementById('configEmpresaCapacitadora'),
+    configCiudadCapacitacion: document.getElementById('configCiudadCapacitacion'),
     configFechaCapacitacion: document.getElementById('configFechaCapacitacion'),
     configHoraInicio: document.getElementById('configHoraInicio'),
     configHoraFin: document.getElementById('configHoraFin'),
+    configNombreInstructor: document.getElementById('configNombreInstructor'),
+    configCargoInstructor: document.getElementById('configCargoInstructor'),
+    configAsesorExterno: document.getElementById('configAsesorExterno'),
+    configFirmaDigital: document.getElementById('configFirmaDigital'),
     configNombreEmpresa: document.getElementById('configNombreEmpresa'),
     configDireccionEmpresa: document.getElementById('configDireccionEmpresa'),
     configTelefonoEmpresa: document.getElementById('configTelefonoEmpresa'),
@@ -288,7 +292,7 @@ const adminUI = {
                     <td>${asistente.numero_documento}</td>
                     <td>${asistente.cargo}</td>
                     <td>${asistente.ruta}</td>
-                    <td>${asistente.hora_llegada}</td>
+                    <td>${asistente.ciudad}</td>
                     <td>
                         ${asistente.firma_digital ? 
                             '<i class="fas fa-check text-success" title="Tiene firma"></i>' : 
@@ -323,10 +327,14 @@ const adminUI = {
     
     loadConfigurationForm: (config) => {
         adminElements.configNombreCapacitacion.value = config.nombre_capacitacion || '';
-        adminElements.configEmpresaCapacitadora.value = config.empresa_capacitadora || '';
+        adminElements.configCiudadCapacitacion.value = config.ciudad_capacitacion || '';
         adminElements.configFechaCapacitacion.value = config.fecha_capacitacion || '';
         adminElements.configHoraInicio.value = config.hora_inicio || '';
         adminElements.configHoraFin.value = config.hora_fin || '';
+        adminElements.configNombreInstructor.value = config.nombre_instructor || '';
+        adminElements.configCargoInstructor.value = config.cargo_instructor || '';
+        adminElements.configAsesorExterno.value = config.asesor_externo || '';
+        adminElements.configFirmaDigital.value = config.firma_digital || '';
         adminElements.configNombreEmpresa.value = config.nombre_empresa || '';
         adminElements.configDireccionEmpresa.value = config.direccion_empresa || '';
         adminElements.configTelefonoEmpresa.value = config.telefono_empresa || '';
@@ -387,10 +395,13 @@ const adminEventHandlers = {
         
         const configData = {
             nombre_capacitacion: adminElements.configNombreCapacitacion.value,
-            empresa_capacitadora: adminElements.configEmpresaCapacitadora.value,
+            ciudad_capacitacion: adminElements.configCiudadCapacitacion.value,
             fecha_capacitacion: adminElements.configFechaCapacitacion.value,
             hora_inicio: adminElements.configHoraInicio.value,
             hora_fin: adminElements.configHoraFin.value,
+            nombre_instructor: adminElements.configNombreInstructor.value,
+            cargo_instructor: adminElements.configCargoInstructor.value,
+            asesor_externo: adminElements.configAsesorExterno.value,
             nombre_empresa: adminElements.configNombreEmpresa.value,
             direccion_empresa: adminElements.configDireccionEmpresa.value,
             telefono_empresa: adminElements.configTelefonoEmpresa.value,

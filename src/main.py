@@ -40,10 +40,14 @@ def crear_datos_iniciales():
     if not config_existente:
         config = Configuracion(
             nombre_capacitacion='Capacitación de Seguridad',
-            empresa_capacitadora='Empresa Capacitadora',
+            ciudad_capacitacion='Ciudad Capacitación',
             hora_inicio=time(8, 0),  # 8:00 AM
             hora_fin=time(17, 0),    # 5:00 PM
             fecha_capacitacion=date.today(),
+            nombre_instructor='Juan Pérez',
+            cargo_instructor='Instructor de Seguridad',
+            asesor_externo='Empresa Asesora',
+            firma_digital_cap='ruta/firma.png',  # o None si no es obligatoria
             nombre_empresa='Mi Empresa',
             direccion_empresa='Calle Principal #123, Ciudad',
             telefono_empresa='+57 300 123 4567'

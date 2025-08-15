@@ -69,9 +69,10 @@ def registrar_asistencia():
         numero_documento = request.form.get('numero_documento', '').strip()
         cargo = request.form.get('cargo', '').strip()
         ruta = request.form.get('ruta', '').strip()
+        ciudad = request.form.get('ciudad', '').strip()
         
         # Validar campos obligatorios
-        if not all([nombres_apellidos, numero_documento, cargo, ruta]):
+        if not all([nombres_apellidos, numero_documento, cargo, ruta, ciudad]):
             return jsonify({
                 'error': 'Todos los campos son obligatorios'
             }), 400
@@ -112,6 +113,7 @@ def registrar_asistencia():
             numero_documento=numero_documento,
             cargo=cargo,
             ruta=ruta,
+            ciudad=ciudad,
             hora_llegada=datetime.now(),
             firma_digital=firma_path,
             fecha_registro=date.today()

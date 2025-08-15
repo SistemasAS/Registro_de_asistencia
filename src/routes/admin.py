@@ -98,8 +98,8 @@ def actualizar_configuracion():
         if 'nombre_capacitacion' in data:
             config.nombre_capacitacion = data['nombre_capacitacion']
         
-        if 'empresa_capacitadora' in data:
-            config.empresa_capacitadora = data['empresa_capacitadora']
+        if 'ciudad_capacitacion' in data:
+            config.ciudad_capacitacion = data['ciudad_capacitacion']
         
         if 'hora_inicio' in data:
             hora_inicio_str = data['hora_inicio']
@@ -116,6 +116,15 @@ def actualizar_configuracion():
         if 'activo' in data:
             config.activo = data['activo']
         
+        if 'nombre_instructor' in data:
+            config.nombre_instructor = data['nombre_instructor']
+
+        if 'cargo_instructor' in data:
+            config.cargo_instructor = data['cargo_instructor']
+        
+        if 'asesor_externo' in data:
+            config.asesor_externo = data['asesor_externo']
+
         if 'nombre_empresa' in data:
             config.nombre_empresa = data['nombre_empresa']
         
@@ -147,7 +156,11 @@ def listar_asistentes_admin():
         cargo_filtro = request.args.get('cargo', '')
         ruta_filtro = request.args.get('ruta', '')
         
-        fecha_obj = datetime.strptime(fecha_filtro, '%Y-%m-%d').date()
+        # Validar formato de fecha
+        try:
+            fecha_obj = datetime.strptime(fecha_filtro, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'error': 'Formato de fecha inválido, use YYYY-MM-DD'}), 400
         
         query = Asistente.query.filter_by(fecha_registro=fecha_obj)
         
@@ -163,9 +176,10 @@ def listar_asistentes_admin():
         
         if ruta_filtro:
             query = query.filter(Asistente.ruta.contains(ruta_filtro))
-        
-        asistentes = query.order_by(Asistente.hora_llegada).all()
-        
+
+        # Ejecutar consulta
+        asistentes = query.all()
+
         # Obtener estadísticas
         total_asistentes = len(asistentes)
         cargos_unicos = list(set([a.cargo for a in asistentes]))
@@ -183,6 +197,7 @@ def listar_asistentes_admin():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @admin_bp.route('/generar-pdf', methods=['GET'])
 @requiere_autenticacion
@@ -215,8 +230,8 @@ def generar_pdf():
         logo_path = os.path.join(current_app.root_path, 'static', 'logotipo.png')
         if os.path.exists(logo_path):
             # Tamaño máximo del logo
-            max_width = 1.2 * inch
-            max_height = 1.2 * inch
+            max_width = 1.4 * inch
+            max_height = 1.4 * inch
             logo = Image(logo_path)
             logo._restrictSize(max_width, max_height)
         else:
@@ -226,7 +241,7 @@ def generar_pdf():
         titulo_centro = [
             Paragraph(
                 "<b>Gestión de Talento Humano</b>",
-                ParagraphStyle(name='SmallTitle', fontSize=12, alignment=TA_CENTER, spaceAfter=2)
+                ParagraphStyle(name='SmallTitle', fontSize=12, alignment=TA_CENTER, spaceAfter=5)
             ),
             Paragraph(
                 "<b>Registro de Asistencia</b>",
@@ -248,7 +263,7 @@ def generar_pdf():
         encabezado_data = [
             [logo, titulo_centro, info_derecha]
         ]
-        encabezado_table = Table(encabezado_data, colWidths=[1.8*inch, 3.5*inch, 2.2*inch])
+        encabezado_table = Table(encabezado_data, colWidths=[2*inch, 3.5*inch, 2.4*inch])
         encabezado_table.setStyle(TableStyle([
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (1, 0), (1, 0), 'CENTER'),
@@ -263,15 +278,16 @@ def generar_pdf():
         # ======== Tabla con información general ========
         info_general = [
             ['Tema', getattr(config, 'nombre_capacitacion', '')],
-            ['Ciudad', getattr(config, 'ciudad', ''), 'Fecha', fecha_obj.strftime('%d/%m/%Y')],
-            ['Nombre del Instructor', getattr(config, 'instructor', ''), 'Cargo', getattr(config, 'cargo', '')],
+            ['Ciudad', getattr(config, 'ciudad_capacitacion', ''), 'Fecha', fecha_obj.strftime('%d/%m/%Y')],
+            ['Nombre del Instructor', getattr(config, 'nombre_instructor', ''), 'Cargo', getattr(config, 'cargo_instructor', '')],
             ['Firma del Capacitador', '', 'Asesor Externo', getattr(config, 'asesor_externo', '')]
         ]
-        tabla_info = Table(info_general, colWidths=[1.5*inch, 2.5*inch, 1.5*inch, 2.5*inch])
+        tabla_info = Table(info_general, colWidths=[1.5*inch, 2.5*inch, 1.4*inch, 2.5*inch])
         tabla_info.setStyle(TableStyle([
+            ('SPAN', (1, 0), (3, 0)),
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
             ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
             ('GRID', (0, 0), (-1, -1), 1, colors.black)
@@ -284,7 +300,7 @@ def generar_pdf():
         # Tabla de asistentes
         if asistentes:
             # Encabezados de la tabla
-            data = [['#', 'Nombres y Apellidos', 'Documento', 'Cargo', 'Ruta', 'Hora Llegada', 'Firma']]
+            data = [['#', 'Nombres y Apellidos', 'Documento', 'Cargo', 'Ruta', 'Ciudad', 'Firma']]
             
             # Agregar datos de asistentes
             for i, asistente in enumerate(asistentes, 1):
@@ -304,7 +320,7 @@ def generar_pdf():
                     asistente.numero_documento,
                     asistente.cargo,
                     asistente.ruta,
-                    asistente.hora_llegada.strftime('%H:%M:%S'),
+                    asistente.ciudad,
                     firma_path
                 ])
             

@@ -9,11 +9,15 @@ class Configuracion(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     nombre_capacitacion = db.Column(db.String(200), nullable=False)
-    empresa_capacitadora = db.Column(db.String(200), nullable=False)
+    ciudad_capacitacion = db.Column(db.String(100), nullable=False)
     hora_inicio = db.Column(db.Time, nullable=False)
     hora_fin = db.Column(db.Time, nullable=False)
     fecha_capacitacion = db.Column(db.Date, nullable=False)
     activo = db.Column(db.Boolean, default=True)
+    nombre_instructor = db.Column(db.String(200), nullable=False)
+    cargo_instructor = db.Column(db.String(100), nullable=False)
+    asesor_externo = db.Column(db.String(100), nullable=False)
+    firma_digital_cap = db.Column(db.String(255))
     
     # Datos fijos de la empresa
     nombre_empresa = db.Column(db.String(200), default="Mi Empresa")
@@ -28,15 +32,20 @@ class Configuracion(db.Model):
         return {
             'id': self.id,
             'nombre_capacitacion': self.nombre_capacitacion,
-            'empresa_capacitadora': self.empresa_capacitadora,
+            'ciudad_capacitacion': self.ciudad_capacitacion,
             'hora_inicio': self.hora_inicio.strftime('%H:%M') if self.hora_inicio else None,
             'hora_fin': self.hora_fin.strftime('%H:%M') if self.hora_fin else None,
             'fecha_capacitacion': self.fecha_capacitacion.strftime('%Y-%m-%d') if self.fecha_capacitacion else None,
             'activo': self.activo,
+            'nombre_instructor': self.nombre_instructor,
+            'cargo_instructor': self.cargo_instructor,
+            'asesor_externo': self.asesor_externo,
+            'firma_digital_cap': self.firma_digital_cap,
             'nombre_empresa': self.nombre_empresa,
             'direccion_empresa': self.direccion_empresa,
             'telefono_empresa': self.telefono_empresa,
-            'logo_empresa': self.logo_empresa
+            'logo_empresa': self.logo_empresa,
+            'firma_digital_cap': self.firma_digital_cap
         }
     
     def esta_en_horario(self):
@@ -64,6 +73,7 @@ class Asistente(db.Model):
     cargo = db.Column(db.String(100), nullable=False)
     ruta = db.Column(db.String(100), nullable=False)
     hora_llegada = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    ciudad = db.Column(db.String(100))  # Nueva columna
     firma_digital = db.Column(db.String(200))  # Ruta al archivo de imagen
     fecha_registro = db.Column(db.Date, nullable=False, default=date.today)
     
@@ -77,6 +87,7 @@ class Asistente(db.Model):
             'numero_documento': self.numero_documento,
             'cargo': self.cargo,
             'ruta': self.ruta,
+            'ciudad': self.ciudad,
             'hora_llegada': self.hora_llegada.strftime('%H:%M:%S') if self.hora_llegada else None,
             'fecha_registro': self.fecha_registro.strftime('%Y-%m-%d') if self.fecha_registro else None,
             'firma_digital': self.firma_digital

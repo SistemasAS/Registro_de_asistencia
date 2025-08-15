@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="admin-styles.css" rel="stylesheet">
 </head>
+
 <body>
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="loading-overlay d-none">
@@ -27,7 +29,7 @@
                             <h2>Panel de Administración</h2>
                             <p>Ingrese sus credenciales para acceder</p>
                         </div>
-                        
+
                         <form id="loginForm">
                             <div class="mb-3">
                                 <label for="usuario" class="form-label">Usuario</label>
@@ -41,7 +43,7 @@
                                 <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
                             </button>
                         </form>
-                        
+
                         <div id="loginError" class="alert alert-danger mt-3 d-none"></div>
                     </div>
                 </div>
@@ -57,7 +59,7 @@
                 <a class="navbar-brand" href="#">
                     <i class="fas fa-cogs me-2"></i>Panel de Administración
                 </a>
-                
+
                 <div class="navbar-nav ms-auto">
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -65,12 +67,14 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/" target="_blank">
-                                <i class="fas fa-external-link-alt me-2"></i>Ver Formulario
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
+                                    <i class="fas fa-external-link-alt me-2"></i>Ver Formulario
+                                </a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="#" onclick="logout()">
-                                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
-                            </a></li>
+                                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                </a></li>
                         </ul>
                     </div>
                 </div>
@@ -130,17 +134,20 @@
             <!-- Tabs Navigation -->
             <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">
+                    <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard"
+                        type="button" role="tab">
                         <i class="fas fa-chart-bar me-2"></i>Dashboard
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="asistentes-tab" data-bs-toggle="tab" data-bs-target="#asistentes" type="button" role="tab">
+                    <button class="nav-link" id="asistentes-tab" data-bs-toggle="tab" data-bs-target="#asistentes"
+                        type="button" role="tab">
                         <i class="fas fa-users me-2"></i>Asistentes
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="configuracion-tab" data-bs-toggle="tab" data-bs-target="#configuracion" type="button" role="tab">
+                    <button class="nav-link" id="configuracion-tab" data-bs-toggle="tab" data-bs-target="#configuracion"
+                        type="button" role="tab">
                         <i class="fas fa-cog me-2"></i>Configuración
                     </button>
                 </li>
@@ -194,7 +201,8 @@
                             <!-- Filtros -->
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control" id="busquedaAsistente" placeholder="Buscar por nombre o documento...">
+                                    <input type="text" class="form-control" id="busquedaAsistente"
+                                        placeholder="Buscar por nombre o documento...">
                                 </div>
                                 <div class="col-md-3">
                                     <select class="form-control" id="filtroCargoAsistente">
@@ -223,7 +231,7 @@
                                             <th>Documento</th>
                                             <th>Cargo</th>
                                             <th>Ruta</th>
-                                            <th>Hora Llegada</th>
+                                            <th>Ciudad</th>
                                             <th>Firma</th>
                                         </tr>
                                     </thead>
@@ -250,19 +258,24 @@
                                     <form id="configForm">
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label for="configNombreCapacitacion" class="form-label">Nombre de la Capacitación</label>
-                                                <input type="text" class="form-control" id="configNombreCapacitacion" required>
+                                                <label for="configNombreCapacitacion" class="form-label">Nombre de la
+                                                    Capacitación</label>
+                                                <input type="text" class="form-control" id="configNombreCapacitacion"
+                                                    required>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label for="configEmpresaCapacitadora" class="form-label">Empresa Capacitadora</label>
-                                                <input type="text" class="form-control" id="configEmpresaCapacitadora" required>
+                                                <label for="configCiudad" class="form-label">Ciudad</label>
+                                                <input type="text" class="form-control" id="configCiudadCapacitacion"
+                                                    required>
                                             </div>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="configFechaCapacitacion" class="form-label">Fecha de Capacitación</label>
-                                                <input type="date" class="form-control" id="configFechaCapacitacion" required>
+                                                <label for="configFechaCapacitacion" class="form-label">Fecha de
+                                                    Capacitación</label>
+                                                <input type="date" class="form-control" id="configFechaCapacitacion"
+                                                    required>
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="configHoraInicio" class="form-label">Hora de Inicio</label>
@@ -275,38 +288,78 @@
                                         </div>
 
                                         <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="configNombreEmpresa" class="form-label">Nombre de la Empresa</label>
-                                                <input type="text" class="form-control" id="configNombreEmpresa" required>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="configNombreInstructor" class="form-label">Nombre del Instructor</label>
+                                                <input type="text" class="form-control" id="configNombreInstructor"
+                                                    required>
                                             </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="configTelefonoEmpresa" class="form-label">Teléfono de la Empresa</label>
-                                                <input type="text" class="form-control" id="configTelefonoEmpresa" required>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="configCargoInstructor" class="form-label">Cargo Instructor</label>
+                                                <input type="text" class="form-control" id="configCargoInstructor" required>
                                             </div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="configDireccionEmpresa" class="form-label">Dirección de la Empresa</label>
-                                            <input type="text" class="form-control" id="configDireccionEmpresa" required>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="configActivo">
-                                                <label class="form-check-label" for="configActivo">
-                                                    Sistema Activo
-                                                </label>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="configAsesorExterno" class="form-label">Asesor Externo</label>
+                                                <input type="text" class="form-control" id="configAsesorExterno">
                                             </div>
                                         </div>
 
-                                        <button type="submit" class="btn btn-primary" id="saveConfigBtn">
-                                            <i class="fas fa-save me-2"></i>Guardar Configuración
-                                        </button>
+
+                                        <div class="mb-4">
+                                            <label for="configFirmaDigital" class="form-label">
+                                                <i class="fas fa-signature me-1"></i>Firma Digital
+                                            </label>
+                                            <input type="file" class="form-control" id="configFirmaDigital"
+                                                name="configFirmaDigital" accept="image/*" capture="environment">
+                                            <div class="form-text">
+                                                Formatos permitidos: PNG, JPG, JPEG, GIF. Tamaño máximo: 5MB
+                                            </div>
+                                            <div id="imagePreview" class="image-preview mt-2 d-none">
+                                                <img id="previewImg" src="" alt="Vista previa" class="preview-image">
+                                                <button type="button" class="btn btn-sm btn-outline-danger remove-image"
+                                                    onclick="removeImage()">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="configNombreEmpresa" class="form-label">Nombre de la
+                                                        Empresa</label>
+                                                    <input type="text" class="form-control" id="configNombreEmpresa"
+                                                        required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="configTelefonoEmpresa" class="form-label">Teléfono de la
+                                                        Empresa</label>
+                                                    <input type="text" class="form-control" id="configTelefonoEmpresa"
+                                                        required>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="configDireccionEmpresa" class="form-label">Dirección de la
+                                                    Empresa</label>
+                                                <input type="text" class="form-control" id="configDireccionEmpresa"
+                                                    required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="configActivo">
+                                                    <label class="form-check-label" for="configActivo">
+                                                        Sistema Activo
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary" id="saveConfigBtn">
+                                                <i class="fas fa-save me-2"></i>Guardar Configuración
+                                            </button>
                                     </form>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-4">
                             <div class="card">
                                 <div class="card-header">
@@ -315,17 +368,18 @@
                                 <div class="card-body">
                                     <h6>Credenciales por Defecto:</h6>
                                     <p><strong>Usuario:</strong> admin<br>
-                                    <strong>Contraseña:</strong> admin123</p>
-                                    
+                                        <strong>Contraseña:</strong> admin123
+                                    </p>
+
                                     <hr>
-                                    
+
                                     <h6>URL del Formulario:</h6>
                                     <p><a href="/" target="_blank" class="btn btn-outline-primary btn-sm">
-                                        <i class="fas fa-external-link-alt me-1"></i>Abrir Formulario
-                                    </a></p>
-                                    
+                                            <i class="fas fa-external-link-alt me-1"></i>Abrir Formulario
+                                        </a></p>
+
                                     <hr>
-                                    
+
                                     <h6>Estado Actual:</h6>
                                     <p id="estadoActualInfo">Verificando...</p>
                                 </div>
@@ -342,5 +396,5 @@
     <!-- Custom JS -->
     <script src="admin-script.js"></script>
 </body>
-</html>
 
+</html>
