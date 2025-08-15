@@ -9,10 +9,24 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from werkzeug.utils import secure_filename
 import tempfile
 import os
 
 admin_bp = Blueprint('admin', __name__)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    """Verifica si el archivo tiene una extensión permitida"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def crear_directorio_uploads():
+    """Crea el directorio de uploads si no existe"""
+    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'firmas_capacitadores')
+    os.makedirs(upload_dir, exist_ok=True)
+    return upload_dir
 
 @admin_bp.route('/login', methods=['POST'])
 def login():
@@ -125,13 +139,15 @@ def actualizar_configuracion():
         if 'asesor_externo' in data:
             config.asesor_externo = data['asesor_externo']
 
+        if 'firma_digital_cap' in data:
+            config.firma_digital_cap = data['firma_digital_cap']
+
         if 'nombre_empresa' in data:
             config.nombre_empresa = data['nombre_empresa']
         
         if 'direccion_empresa' in data:
             config.direccion_empresa = data['direccion_empresa']
-            
-        
+
         if 'telefono_empresa' in data:
             config.telefono_empresa = data['telefono_empresa']
         
@@ -280,7 +296,7 @@ def generar_pdf():
             ['Tema', getattr(config, 'nombre_capacitacion', '')],
             ['Ciudad', getattr(config, 'ciudad_capacitacion', ''), 'Fecha', fecha_obj.strftime('%d/%m/%Y')],
             ['Nombre del Instructor', getattr(config, 'nombre_instructor', ''), 'Cargo', getattr(config, 'cargo_instructor', '')],
-            ['Firma del Capacitador', '', 'Asesor Externo', getattr(config, 'asesor_externo', '')]
+            ['Firma del Capacitador', getattr(config, 'firma_digital_cap'), 'Asesor Externo', getattr(config, 'asesor_externo', '')]
         ]
         tabla_info = Table(info_general, colWidths=[1.5*inch, 2.5*inch, 1.4*inch, 2.5*inch])
         tabla_info.setStyle(TableStyle([

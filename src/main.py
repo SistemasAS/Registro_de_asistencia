@@ -47,7 +47,7 @@ def crear_datos_iniciales():
             nombre_instructor='Juan Pérez',
             cargo_instructor='Instructor de Seguridad',
             asesor_externo='Empresa Asesora',
-            firma_digital_cap='ruta/firma.png',  # o None si no es obligatoria
+            firma_digital_cap='static/uploads',  # o None si no es obligatoria
             nombre_empresa='Mi Empresa',
             direccion_empresa='Calle Principal #123, Ciudad',
             telefono_empresa='+57 300 123 4567'

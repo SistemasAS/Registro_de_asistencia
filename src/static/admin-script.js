@@ -334,7 +334,7 @@ const adminUI = {
         adminElements.configNombreInstructor.value = config.nombre_instructor || '';
         adminElements.configCargoInstructor.value = config.cargo_instructor || '';
         adminElements.configAsesorExterno.value = config.asesor_externo || '';
-        adminElements.configFirmaDigital.value = config.firma_digital || '';
+        adminElements.configFirmaDigital.value = config.firma_digital_cap || '';
         adminElements.configNombreEmpresa.value = config.nombre_empresa || '';
         adminElements.configDireccionEmpresa.value = config.direccion_empresa || '';
         adminElements.configTelefonoEmpresa.value = config.telefono_empresa || '';
@@ -407,6 +407,7 @@ const adminEventHandlers = {
             telefono_empresa: adminElements.configTelefonoEmpresa.value,
             activo: adminElements.configActivo.checked
         };
+
         
         try {
             adminUtils.showLoading();
