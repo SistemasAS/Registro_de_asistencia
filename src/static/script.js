@@ -21,7 +21,7 @@ const elements = {
     telefonoEmpresa: document.getElementById('telefonoEmpresa'),
     logoEmpresa: document.getElementById('logoEmpresa'),
     nombreCapacitacion: document.getElementById('nombreCapacitacion'),
-    empresaCapacitadora: document.getElementById('empresaCapacitadora'),
+    ciudadCapacitadora: document.getElementById('ciudadCapacitadora'),
     fechaCapacitacion: document.getElementById('fechaCapacitacion'),
     horarioCapacitacion: document.getElementById('horarioCapacitacion'),
     statusIcon: document.getElementById('statusIcon'),
@@ -160,8 +160,8 @@ const ui = {
             elements.nombreCapacitacion.innerHTML = `<i class="fas fa-graduation-cap me-2"></i>${config.nombre_capacitacion}`;
         }
 
-        if (config.empresa_capacitadora) {
-            elements.empresaCapacitadora.textContent = config.empresa_capacitadora;
+        if (config.ciudad_capacitadora) {
+            elements.ciudadCapacitadora.textContent = config.ciudad_capacitadora;
         }
 
         if (config.fecha_capacitacion) {

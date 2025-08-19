@@ -52,6 +52,8 @@ const adminElements = {
     configCargoInstructor: document.getElementById('configCargoInstructor'),
     configAsesorExterno: document.getElementById('configAsesorExterno'),
     configFirmaDigital: document.getElementById('configFirmaDigital'),
+    imagePreview: document.getElementById('imagePreview'),
+    previewImg: document.getElementById('previewImg'),
     configNombreEmpresa: document.getElementById('configNombreEmpresa'),
     configDireccionEmpresa: document.getElementById('configDireccionEmpresa'),
     configTelefonoEmpresa: document.getElementById('configTelefonoEmpresa'),
@@ -205,6 +207,8 @@ const adminApi = {
         document.body.removeChild(a);
     }
 };
+
+
 
 // Funciones de UI para admin
 const adminUI = {
@@ -584,6 +588,34 @@ const adminApp = {
         adminApp.checkAuthentication();
     }
 };
+
+
+document.getElementById("configFirmaDigital").addEventListener("change", async function () {
+    const fileInput = this;
+    if (fileInput.files.length > 0) {
+        let formData = new FormData();
+        formData.append("configFirmaDigital", fileInput.files[0]);
+
+        try {
+            let res = await fetch("/admin/subir_firma", {
+                method: "POST",
+                body: formData
+            });
+            let data = await res.json();
+            if (res.ok) {
+                console.log("✅ Firma guardada en:", data.url);
+                document.getElementById("previewImg").src = data.url;
+                document.getElementById("imagePreview").classList.remove("d-none");
+            } else {
+                console.error("❌ Error:", data.error);
+            }
+        } catch (err) {
+            console.error("Error al subir la firma:", err);
+        }
+    }
+});
+
+
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', adminApp.init);

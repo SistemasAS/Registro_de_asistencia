@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session, send_file, current_app
+from flask import Blueprint, request, jsonify, session, send_file, current_app, url_for
 from src.models.asistencia import db, Administrador, Configuracion, Asistente
 from datetime import datetime, date, time
 import os
@@ -15,18 +15,57 @@ import os
 
 admin_bp = Blueprint('admin', __name__)
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+UPLOAD_FOLDER = "static/firmas"
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+
+# Crear carpeta si no existe
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 
 def allowed_file(filename):
-    """Verifica si el archivo tiene una extensión permitida"""
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def crear_directorio_uploads():
-    """Crea el directorio de uploads si no existe"""
-    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'firmas_capacitadores')
-    os.makedirs(upload_dir, exist_ok=True)
-    return upload_dir
+@admin_bp.route("/subir_firma", methods=["POST"])
+def subir_firma():
+    try:
+        if "configFirmaDigital" not in request.files:
+            return jsonify({"error": "No se envió ningún archivo"}), 400
+
+        file = request.files["configFirmaDigital"]
+
+        if file.filename == "":
+            return jsonify({"error": "El archivo no tiene nombre"}), 400
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+
+            upload_folder = os.path.join(current_app.root_path, "static", "firmas")
+            os.makedirs(upload_folder, exist_ok=True)
+
+            filepath = os.path.join(upload_folder, filename)
+
+            # Guardamos el archivo físicamente
+            file.save(filepath)
+
+            # Ruta relativa que guardamos en la BD (ejemplo: firmas/mi_firma.png)
+            ruta_relativa = os.path.join("static", "firmas", filename)
+
+            # Buscamos la configuración activa y actualizamos
+            config = Configuracion.query.first()
+            config.firma_digital_cap = ruta_relativa
+            db.session.commit()
+
+            return jsonify({
+                "message": "Firma subida correctamente",
+                "ruta": ruta_relativa 
+            }), 200
+        else: 
+            return jsonify({"error": "Formato de archivo no permitido"}), 400
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @admin_bp.route('/login', methods=['POST'])
 def login():
@@ -291,12 +330,21 @@ def generar_pdf():
         story.append(encabezado_table)
         story.append(Spacer(1, 12))
 
+        if config.firma_digital_cap:
+            ruta_absoluta = os.path.join(current_app.root_path, config.firma_digital_cap)
+            if os.path.exists(ruta_absoluta):
+                firma_img = Image(ruta_absoluta, width=1*inch, height=0.2*inch)
+            else:
+                firma_img = Paragraph("No disponible", styles['Normal'])
+        else:
+            firma_img = Paragraph("No disponible", styles['Normal'])
+
         # ======== Tabla con información general ========
         info_general = [
             ['Tema', getattr(config, 'nombre_capacitacion', '')],
             ['Ciudad', getattr(config, 'ciudad_capacitacion', ''), 'Fecha', fecha_obj.strftime('%d/%m/%Y')],
             ['Nombre del Instructor', getattr(config, 'nombre_instructor', ''), 'Cargo', getattr(config, 'cargo_instructor', '')],
-            ['Firma del Capacitador', getattr(config, 'firma_digital_cap'), 'Asesor Externo', getattr(config, 'asesor_externo', '')]
+            ['Firma del Capacitador', firma_img, 'Asesor Externo', getattr(config, 'asesor_externo', '')]
         ]
         tabla_info = Table(info_general, colWidths=[1.5*inch, 2.5*inch, 1.4*inch, 2.5*inch])
         tabla_info.setStyle(TableStyle([
@@ -324,7 +372,7 @@ def generar_pdf():
                 if asistente.firma_digital:
                     firma_absoluta = os.path.join(current_app.root_path, 'static', asistente.firma_digital)
                     if os.path.exists(firma_absoluta):
-                        firma_path = Image(firma_absoluta, width=0.8*inch, height=0.4*inch)
+                        firma_path = Image(firma_absoluta, width=1.4*inch, height=0.3*inch)
                     else:
                         firma_path = "Sin firma"
                 else:
