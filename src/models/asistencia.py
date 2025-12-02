@@ -40,6 +40,10 @@ class Configuracion(db.Model):
     telefono_empresa = db.Column(db.String(50), default="Teléfono de contacto")
     logo_empresa = db.Column(db.String(200))  # Ruta al archivo de logo
     
+    # ✅ Relaciones definidas SOLO AQUÍ en Configuracion
+    asistentes = db.relationship('Asistente', backref='configuracion', lazy=True)
+    capacitadores = db.relationship('Capacitador', backref='configuracion', lazy=True)
+    
     def __repr__(self):
         return f'<Configuracion {self.nombre_capacitacion}>'
     
@@ -101,12 +105,11 @@ class Capacitador(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre_completo = db.Column(db.String(200), nullable=False)
     firma_digital = db.Column(db.String(500))
-    # ✅ IMPORTANTE: No usar default con funciones que se evalúan al importar
-    # Los defaults se deben pasar al crear el objeto, no en la definición de columna
     fecha_registro = db.Column(db.Date, nullable=False)
     hora_registro = db.Column(db.Time, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: now_colombia())
     
+    # ✅ Solo ForeignKey, sin backref (ya está definido en Configuracion)
     configuracion_id = db.Column(db.Integer, db.ForeignKey('configuracion.id'), nullable=False)
     
     def to_dict(self):
@@ -132,12 +135,12 @@ class Asistente(db.Model):
     numero_documento = db.Column(db.String(50), nullable=False)
     cargo = db.Column(db.String(100), nullable=False)
     ruta = db.Column(db.String(100), nullable=False)
-    # ✅ Cambiar default para usar hora de Colombia con lambda
     hora_llegada = db.Column(db.DateTime, nullable=False, default=lambda: now_colombia())
     ciudad = db.Column(db.String(100))
     firma_digital = db.Column(db.String(200))  # Ruta al archivo de imagen
     fecha_registro = db.Column(db.Date, nullable=False, default=lambda: today_colombia())
     
+    # ✅ Solo ForeignKey, sin backref (ya está definido en Configuracion)
     configuracion_id = db.Column(db.Integer, db.ForeignKey('configuracion.id'), nullable=False)
 
     def __repr__(self):
