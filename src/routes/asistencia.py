@@ -25,48 +25,85 @@ def crear_directorio_uploads():
     os.makedirs(upload_dir, exist_ok=True)
     return upload_dir
 
+# ✅ FUNCIONES AUXILIARES PARA MANEJAR ZONA HORARIA
+def now_colombia():
+    """Obtiene la hora actual en Colombia"""
+    return current_app.config['NOW_CO']()
+
+def today_colombia():
+    """Obtiene la fecha actual en Colombia"""
+    return current_app.config['TODAY_CO']()
+
+def current_time_colombia():
+    """Obtiene solo la hora actual en Colombia (sin fecha)"""
+    return current_app.config['CURRENT_TIME_CO']()
+
 @asistencia_bp.route('/estado', methods=['GET'])
 def obtener_estado():
     """Obtiene el estado actual del sistema"""
     try:
         print("🔍 Solicitando estado del sistema...")
         
-        # ✅ Buscar la configuración activa del día
-        config = Configuracion.get_configuracion_activa()
+        # ✅ Usar fecha de Colombia en lugar de date.today()
+        hoy_colombia = today_colombia()
+        hora_actual_colombia = current_time_colombia()
+        
+        print(f"📅 Fecha Colombia: {hoy_colombia}")
+        print(f"🕐 Hora Colombia: {hora_actual_colombia}")
+        
+        # ✅ Buscar configuración para HOY en Colombia
+        config = Configuracion.query.filter(
+            Configuracion.activo == True,
+            Configuracion.fecha_capacitacion == hoy_colombia
+        ).first()
         
         if not config:
-            # Buscar si hay alguna configuración para hoy aunque no esté en horario
-            config = Configuracion.query.filter(
-                Configuracion.activo == True,
-                Configuracion.fecha_capacitacion == date.today()
-            ).first()
-            
-            if not config:
-                print("❌ No hay capacitaciones programadas para hoy")
-                return jsonify({
-                    'disponible': False,
-                    'mensaje': 'No hay capacitaciones programadas para hoy',
-                    'configuracion': None
-                }), 200  # ✅ Cambiar a 200 en lugar de 404
+            print("❌ No hay capacitaciones programadas para hoy")
+            return jsonify({
+                'disponible': False,
+                'mensaje': 'No hay capacitaciones programadas para hoy',
+                'configuracion': None,
+                'debug_info': {
+                    'fecha_actual_colombia': hoy_colombia.isoformat(),
+                    'hora_actual_colombia': hora_actual_colombia.strftime('%H:%M:%S')
+                }
+            }), 200
         
-        disponible = config.esta_en_horario()
+        # ✅ Verificar si está en horario (comparar time con time)
+        esta_en_horario = (config.hora_inicio <= hora_actual_colombia <= config.hora_fin)
+        disponible = config.activo and esta_en_horario
+        
+        print(f"⏰ Horario configurado: {config.hora_inicio} - {config.hora_fin}")
+        print(f"⏰ Hora actual: {hora_actual_colombia}")
+        print(f"✅ Está en horario: {esta_en_horario}")
+        print(f"✅ Sistema disponible: {disponible}")
         
         response_data = {
             'disponible': disponible,
-            'configuracion': config.to_dict()
+            'configuracion': config.to_dict(),
+            'debug_info': {
+                'fecha_actual_colombia': hoy_colombia.isoformat(),
+                'hora_actual_colombia': hora_actual_colombia.strftime('%H:%M:%S'),
+                'fecha_capacitacion': config.fecha_capacitacion.isoformat(),
+                'hora_inicio': config.hora_inicio.strftime('%H:%M'),
+                'hora_fin': config.hora_fin.strftime('%H:%M'),
+                'es_dia_correcto': (hoy_colombia == config.fecha_capacitacion),
+                'esta_en_horario': esta_en_horario,
+                'activo': config.activo
+            }
         }
         
         if not disponible:
             if not config.activo:
                 response_data['mensaje'] = 'El formulario está desactivado'
-            elif date.today() != config.fecha_capacitacion:
+            elif hoy_colombia != config.fecha_capacitacion:
                 response_data['mensaje'] = f'La capacitación está programada para {config.fecha_capacitacion.strftime("%d/%m/%Y")}'
             else:
                 response_data['mensaje'] = f'El formulario está disponible de {config.hora_inicio.strftime("%H:%M")} a {config.hora_fin.strftime("%H:%M")}'
         else:
             response_data['mensaje'] = 'Formulario disponible'
         
-        print(f"✅ Estado enviado: {response_data}")
+        print(f"✅ Estado enviado: disponible={disponible}")
         return jsonify(response_data), 200
     
     except Exception as e:
@@ -81,12 +118,28 @@ def registrar_asistencia():
     try:
         print("🔍 Intentando registrar asistencia...")
         
-        # ✅ Obtener la configuración activa
-        config = Configuracion.get_configuracion_activa()
+        # ✅ Usar fecha y hora de Colombia
+        hoy_colombia = today_colombia()
+        hora_actual_colombia = current_time_colombia()
+        now_co = now_colombia()
         
-        if not config or not config.esta_en_horario():
+        # ✅ Obtener la configuración activa para HOY
+        config = Configuracion.query.filter(
+            Configuracion.activo == True,
+            Configuracion.fecha_capacitacion == hoy_colombia
+        ).first()
+        
+        if not config:
             return jsonify({
-                'error': 'El formulario no está disponible en este momento'
+                'error': 'No hay capacitaciones programadas para hoy'
+            }), 403
+        
+        # ✅ Verificar si está en horario
+        esta_en_horario = (config.hora_inicio <= hora_actual_colombia <= config.hora_fin)
+        
+        if not esta_en_horario:
+            return jsonify({
+                'error': f'El formulario está disponible de {config.hora_inicio.strftime("%H:%M")} a {config.hora_fin.strftime("%H:%M")}'
             }), 403
         
         # Obtener datos del formulario
@@ -105,7 +158,7 @@ def registrar_asistencia():
         
         asistente_existente = Asistente.query.filter_by(
             numero_documento=numero_documento,
-            configuracion_id=config.id  # Valida por capacitación específica
+            configuracion_id=config.id
         ).first()
         
         if asistente_existente:
@@ -119,35 +172,25 @@ def registrar_asistencia():
         
         if firma_digital_data:
             try:
-                # Crear directorio de uploads
                 upload_dir = crear_directorio_uploads()
-
-                # Generar nombre único
                 unique_filename = f"{uuid.uuid4().hex}.png"
                 file_path = os.path.join(upload_dir, unique_filename)
 
-                # ✅ Decodificar base64 correctamente
                 if firma_digital_data.startswith("data:image"):
-                    # Remover el prefijo data:image/png;base64,
                     firma_digital_data = firma_digital_data.split(",", 1)[1]
 
-                # Decodificar y guardar
                 image_data = base64.b64decode(firma_digital_data)
                 image = Image.open(BytesIO(image_data)).convert("RGBA")
-
-                # Guardar como PNG (mantiene transparencia)
                 image.save(file_path, format="PNG")
 
-                # Guardar ruta relativa
                 firma_path = f"uploads/firmas/{unique_filename}"
-                
                 print(f"✅ Firma guardada correctamente en: {file_path}")
                 
             except Exception as e:
                 print(f"❌ Error al guardar firma: {str(e)}")
-                # No fallar el registro si hay error con la firma
                 firma_path = None
         
+        # ✅ Usar hora de Colombia para registro
         nuevo_asistente = Asistente(
             nombres_apellidos=nombres_apellidos,
             tipodocumento=tipodocumento,
@@ -155,10 +198,10 @@ def registrar_asistencia():
             cargo=cargo,
             ruta=ruta,
             ciudad=ciudad,
-            hora_llegada=datetime.now(),
+            hora_llegada=now_co,  # ✅ Hora de Colombia
             firma_digital=firma_path,
-            fecha_registro=date.today(),
-            configuracion_id=config.id  # Vincular con capacitación activa
+            fecha_registro=hoy_colombia,  # ✅ Fecha de Colombia
+            configuracion_id=config.id
         )
         
         db.session.add(nuevo_asistente)
@@ -183,7 +226,8 @@ def registrar_asistencia():
 def listar_asistentes():
     """Lista todos los asistentes registrados (solo para uso interno)"""
     try:
-        fecha_filtro = request.args.get('fecha', date.today().strftime('%Y-%m-%d'))
+        # ✅ Usar fecha de Colombia por defecto
+        fecha_filtro = request.args.get('fecha', today_colombia().strftime('%Y-%m-%d'))
         fecha_obj = datetime.strptime(fecha_filtro, '%Y-%m-%d').date()
         
         asistentes = Asistente.query.filter_by(fecha_registro=fecha_obj).all()
@@ -203,19 +247,34 @@ def registrar_capacitador():
     try:
         print("🔍 Intentando registrar capacitador...")
         
-        # ✅ Obtener la configuración activa
-        config = Configuracion.get_configuracion_activa()
+        # ✅ Usar fecha y hora de Colombia
+        hoy_colombia = today_colombia()
+        hora_actual_colombia = current_time_colombia()
+        now_co = now_colombia()
         
-        if not config or not config.esta_en_horario():
+        # ✅ Obtener la configuración activa para HOY
+        config = Configuracion.query.filter(
+            Configuracion.activo == True,
+            Configuracion.fecha_capacitacion == hoy_colombia
+        ).first()
+        
+        if not config:
             return jsonify({
-                'error': 'El formulario no está disponible en este momento'
+                'error': 'No hay capacitaciones programadas para hoy'
+            }), 403
+        
+        # ✅ Verificar si está en horario
+        esta_en_horario = (config.hora_inicio <= hora_actual_colombia <= config.hora_fin)
+        
+        if not esta_en_horario:
+            return jsonify({
+                'error': f'El formulario está disponible de {config.hora_inicio.strftime("%H:%M")} a {config.hora_fin.strftime("%H:%M")}'
             }), 403
         
         # Obtener datos del formulario
         nombre_completo = request.form.get('nombre_completo', '').strip()
         firma_digital_data = request.form.get('firma_digital', '').strip()
         
-        # Validar campos obligatorios
         if not nombre_completo:
             return jsonify({
                 'error': 'El nombre es obligatorio'
@@ -254,13 +313,13 @@ def registrar_capacitador():
                 print(f"❌ Error al guardar firma del capacitador: {str(e)}")
                 firma_path = None
         
-        # ✅ Crear nuevo registro vinculado a la capacitación activa
+        # ✅ Usar fecha y hora de Colombia
         nuevo_capacitador = Capacitador(
             nombre_completo=nombre_completo,
             firma_digital=firma_path,
-            fecha_registro=date.today(),
-            hora_registro=datetime.now().time(),
-            configuracion_id=config.id  # ✅ Vincular con capacitación activa
+            fecha_registro=hoy_colombia,  # ✅ Fecha de Colombia
+            hora_registro=hora_actual_colombia,  # ✅ Hora de Colombia
+            configuracion_id=config.id
         )
         
         db.session.add(nuevo_capacitador)
@@ -284,9 +343,15 @@ def registrar_capacitador():
 # ✅ RUTA DE PRUEBA para verificar que el blueprint funciona
 @asistencia_bp.route('/test', methods=['GET'])
 def test():
-    """Ruta de prueba"""
+    """Ruta de prueba con información de zona horaria"""
+    hoy_colombia = today_colombia()
+    hora_colombia = current_time_colombia()
+    
     return jsonify({
         'mensaje': 'Blueprint de asistencia funcionando correctamente',
+        'zona_horaria': 'America/Bogota',
+        'fecha_colombia': hoy_colombia.isoformat(),
+        'hora_colombia': hora_colombia.strftime('%H:%M:%S'),
         'rutas_disponibles': [
             '/api/estado',
             '/api/registrar',

@@ -1,8 +1,25 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, time
+from zoneinfo import ZoneInfo
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
+
+# ✅ Configuración de zona horaria de Colombia
+COLOMBIA_TZ = ZoneInfo("America/Bogota")
+
+def now_colombia():
+    """Retorna datetime actual en zona horaria de Colombia"""
+    return datetime.now(COLOMBIA_TZ)
+
+def today_colombia():
+    """Retorna la fecha actual en Colombia"""
+    return now_colombia().date()
+
+def current_time_colombia():
+    """Retorna solo la hora actual en Colombia (sin fecha)"""
+    return now_colombia().time()
+
 
 class Configuracion(db.Model):
     __tablename__ = 'configuracion'
@@ -43,13 +60,12 @@ class Configuracion(db.Model):
             'logo_empresa': self.logo_empresa,
         }
     
+    @staticmethod
     def get_configuracion_activa():
-        """Obtiene la configuración activa del día actual"""
-        from datetime import datetime
-        
-        ahora = datetime.now()
-        fecha_hoy = ahora.date()
-        hora_actual = ahora.time()
+        """Obtiene la configuración activa del día actual en Colombia"""
+        # ✅ Usar hora de Colombia en lugar de datetime.now()
+        fecha_hoy = today_colombia()
+        hora_actual = current_time_colombia()
         
         # Buscar configuración activa para hoy en el horario correcto
         config = Configuracion.query.filter(
@@ -66,9 +82,9 @@ class Configuracion(db.Model):
         if not self.activo:
             return False
         
-        ahora = datetime.now()
-        fecha_hoy = ahora.date()
-        hora_actual = ahora.time()
+        # ✅ Usar hora de Colombia en lugar de datetime.now()
+        fecha_hoy = today_colombia()
+        hora_actual = current_time_colombia()
         
         # Verificar si es la fecha de la capacitación
         if fecha_hoy != self.fecha_capacitacion:
@@ -85,13 +101,14 @@ class Capacitador(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre_completo = db.Column(db.String(200), nullable=False)
     firma_digital = db.Column(db.String(500))
-    fecha_registro = db.Column(db.Date, nullable=False, default=date.today)
-    hora_registro = db.Column(db.Time, nullable=False, default=datetime.now().time)
-    created_at = db.Column(db.DateTime, default=datetime.now)
+    # ✅ IMPORTANTE: No usar default con funciones que se evalúan al importar
+    # Los defaults se deben pasar al crear el objeto, no en la definición de columna
+    fecha_registro = db.Column(db.Date, nullable=False)
+    hora_registro = db.Column(db.Time, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: now_colombia())
     
     configuracion_id = db.Column(db.Integer, db.ForeignKey('configuracion.id'), nullable=False)
-    configuracion = db.relationship('Configuracion', backref='capacitadores')
-
+    
     def to_dict(self):
         """Convierte el objeto a diccionario"""
         return {
@@ -115,13 +132,13 @@ class Asistente(db.Model):
     numero_documento = db.Column(db.String(50), nullable=False)
     cargo = db.Column(db.String(100), nullable=False)
     ruta = db.Column(db.String(100), nullable=False)
-    hora_llegada = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    # ✅ Cambiar default para usar hora de Colombia con lambda
+    hora_llegada = db.Column(db.DateTime, nullable=False, default=lambda: now_colombia())
     ciudad = db.Column(db.String(100))
     firma_digital = db.Column(db.String(200))  # Ruta al archivo de imagen
-    fecha_registro = db.Column(db.Date, nullable=False, default=date.today)
+    fecha_registro = db.Column(db.Date, nullable=False, default=lambda: today_colombia())
     
     configuracion_id = db.Column(db.Integer, db.ForeignKey('configuracion.id'), nullable=False)
-    configuracion = db.relationship('Configuracion', backref='asistentes')
 
     def __repr__(self):
         return f'<Asistente {self.nombres_apellidos}>'
@@ -138,7 +155,7 @@ class Asistente(db.Model):
             'hora_llegada': self.hora_llegada.strftime('%H:%M:%S') if self.hora_llegada else None,
             'fecha_registro': self.fecha_registro.strftime('%Y-%m-%d') if self.fecha_registro else None,
             'firma_digital': self.firma_digital,
-            'configuracion_id': self.configuracion_id,  # ✅ Agregar
+            'configuracion_id': self.configuracion_id,
             'nombre_capacitacion': self.configuracion.nombre_capacitacion if self.configuracion else None
         }
 

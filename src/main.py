@@ -1,7 +1,7 @@
 import os
 import sys
 from datetime import date, time, datetime
-from zoneinfo import ZoneInfo  # stdlib (Python 3.9+)
+from zoneinfo import ZoneInfo
 
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -23,6 +23,10 @@ def today_co():
     """Devuelve la fecha (date) actual en Colombia."""
     return now_co().date()
 
+def current_time_co():
+    """Devuelve solo la hora actual en Colombia como objeto time (naïve)."""
+    return now_co().time()
+
 # --- App Flask ---
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
@@ -40,6 +44,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirnam
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+# Hacer disponibles las funciones de timezone para otros módulos
+app.config['NOW_CO'] = now_co
+app.config['TODAY_CO'] = today_co
+app.config['CURRENT_TIME_CO'] = current_time_co
+app.config['COLOMBIA_TZ'] = COLOMBIA_TZ
+
 def crear_datos_iniciales():
     """Crea datos iniciales si no existen (usando fecha en Colombia)."""
     # Crear administrador por defecto
@@ -56,10 +66,10 @@ def crear_datos_iniciales():
             nombre_capacitacion='Capacitación de Seguridad',
             ciudad_capacitacion='Ciudad Capacitación',
             modalidad_capacitacion='Virtual / Presencial',
-            hora_inicio=time(8, 0),  # 8:00 AM (naïve time)
-            hora_fin=time(17, 0),    # 5:00 PM (naïve time)
-            fecha_capacitacion=today_co(),  # <-- fecha en zona America/Bogota
-            asesor_externo=' ',  # o None si no es obligatoria
+            hora_inicio=time(13, 0),  # 1:00 PM Colombia (naïve time)
+            hora_fin=time(15, 30),    # 3:30 PM Colombia (naïve time)
+            fecha_capacitacion=today_co(),
+            asesor_externo=' ',
             nombre_empresa='AUTOSNACK SAS',
             direccion_empresa='Av. Boyacá #95 - 51',
             telefono_empresa='(601) 743 3904'
@@ -90,5 +100,7 @@ def serve(path):
 
 
 if __name__ == '__main__':
-    # En Render no ejecutes con debug True; aquí es solo para local
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    # En Render usa puerto 10000 por defecto y no debug
+    port = int(os.environ.get('PORT', 5001))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    app.run(host='0.0.0.0', port=port, debug=debug)
