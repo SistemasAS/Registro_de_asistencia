@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Asistencia Digital</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <header class="header-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <div class="logo-container">
+                            <img id="logoEmpresa" src="logotipo.png" alt="Logo Empresa" class="company-logo">
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="company-info">
+                            <h1 id="nombreEmpresa" class="company-name">AUTOSNACK SAS</h1>
+                            <p id="direccionEmpresa" class="company-address">Av. Boyacá #95-51</p>
+                            <p id="telefonoEmpresa" class="company-phone">(601) 7433904</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Training Info Section -->
+        <section class="training-info-section">
+            <div class="container">
+                <div class="training-card">
+                    <h2 id="nombreCapacitacion" class="training-title">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Capacitación de Seguridad
+                    </h2>
+                    <div class="training-details">
+
+                        <div class="col-md-6">
+                            <p><strong>Fecha:</strong> <span id="fechaCapacitacion">Hoy</span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Horario:</strong> <span id="horarioCapacitacion">08:00 - 17:00</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="status-indicator">
+                                <i id="statusIcon" class="fas fa-circle me-1"></i>
+                                <span id="statusText">Verificando estado...</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- System Status Alert -->
+            <div id="systemAlert" class="alert alert-info d-none" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                <span id="systemMessage">Verificando estado del sistema...</span>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="registrationSection" class="registration-section">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h3><i class="fas fa-user-plus me-2"></i>Registro de Asistencia</h3>
+                        <p class="form-subtitle">Complete todos los campos para registrar su asistencia</p>
+                    </div>
+
+                    <form id="registrationForm" class="needs-validation" novalidate>
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+                                <label for="nombresApellidos" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Nombres y Apellidos *
+                                </label>
+                                <input type="text" class="form-control" id="nombresApellidos" name="nombres_apellidos"
+                                    required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese sus nombres y apellidos.
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="tipodocumento" class="form-label">
+                                    <i class="fas fa-briefcase me-1"></i>Tipo de documento *
+                                </label>
+                                <select type="text" class="form-control" id="tipodocumento" name="tipodocumento" required>
+                                    <option value="">Seleccione su tipo de documento</option>
+                                    <option value="CC">CC</option>
+                                    <option value="CE">CE</option>
+                                    <option value="TI">TI</option>
+                                    <option value="PT">PT</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese su cargo.
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="numeroDocumento" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>Número de Documento *
+                                </label>
+                                <input type="text" class="form-control" id="numeroDocumento" name="numero_documento"
+                                    required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese su número de documento.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="cargo" class="form-label">
+                                    <i class="fas fa-briefcase me-1"></i>Cargo *
+                                </label>
+                                <select type="text" class="form-control" id="cargo" name="cargo" required>
+                                    <option value="">Seleccione un cargo</option>
+                                    <option value="Operador Movil">Operador Movil</option>
+                                    <option value="Operador Fijo">Operador Fijo</option>
+                                    <option value="Operador Líder">Operador Líder</option>
+                                    <option value="Distribuidor">Distribuidor</option>
+                                    <option value="Coordinador Operativo">Coordinador Operativo</option>
+                                    <option value="Coordinador Técnico">Coordinador Técnico</option>
+                                    <option value="Técnico">Técnico</option>
+                                    <option value="Jefé de Bodega">Jefé de Bodega</option>
+                                    <option value="Director">Director</option>
+                                    <option value="Líder de Operaciones">Líder de Operaciones</option>
+                                    <option value="Auxiliar Administrativo">Auxiliar Administrativo</option>
+                                    <option value="Comercial">Comercial</option>
+                                    <option value="Administrativo">Administrativo</option>
+                                    <option value="Supernumerario">Supernumerario</option>
+                                    <option value="Controller">Controller</option>
+                                    <option value="Gerencia">Gerencia</option>
+                                    <option value="Aprendiz SENA">Aprendiz SENA</option>
+                                    <option value="Contador">Contador</option>
+                                    <option value="Auxiliar Contable">Auxiliar contable</option>
+                                    <option value="Jefé de HSEQ">Jefé de HSEQ</option>
+                                    <option value="OTRO">OTROS</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese su cargo.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ruta" class="form-label">
+                                    <i class="fas fa-route me-1"></i>Ruta *
+                                    (Si no cuenta con una ruta o no aplica, debe escribir "NA")
+                                </label>
+                                <input type="text" class="form-control" id="ruta" name="ruta">
+                                <div class="invalid-feedback">
+                                    Por favor ingrese su ruta.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ciudad" class="form-label">
+                                    <i class="fas fa-briefcase me-1"></i>Ciudad *
+                                </label>
+                                <select type="text" class="form-control" id="ciudad" name="ciudad" required>
+                                    <option value="">Seleccione una ciudad</option>
+                                    <option value="Bogotá">Bogotá</option>
+                                    <option value="Medellín">Medellín</option>
+                                    <option value="Cali">Cali</option>
+                                    <option value="Barranquilla">Barranquilla</option>
+                                    <option value="Cartagena">Cartagena</option>
+                                    <option value="Galicia">Galicia</option>
+                                    <option value="Ibague">Ibague</option>
+                                    <option value="Pereira">Pereira</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese su ciudad.
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-signature me-1"></i>Firma Digital *
+                                </label>
+                                <div class="signature-wrapper border rounded p-2 bg-light" style="overflow: hidden;">
+                                    <!-- Canvas responsive que se ajusta al contenedor -->
+                                    <canvas id="signatureCanvas"
+                                        style="width: 100%; max-width: 100%; height: 200px; border: 2px dashed #ccc; border-radius: 10px; background-color: white; display: block; touch-action: none;"></canvas>
+                                    <div class="mt-2 d-flex justify-content-center gap-2">
+                                        <button type="button" id="clearSignature"
+                                            class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-eraser me-1"></i> Borrar
+                                        </button>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">✍️ Dibuje su firma con el dedo o
+                                        mouse</small>
+                                </div>
+                                <div class="invalid-feedback d-block" id="signatureError"
+                                    style="display: none !important;">
+                                    Por favor firme en el recuadro.
+                                </div>
+                            </div>
+
+                            <!-- Mantén el input oculto para compatibilidad -->
+                            <input type="file" id="firmaDigital" name="firma_digital" style="display: none;">
+                            <div id="imagePreview" class="image-preview mt-2 d-none">
+                                <img id="previewImg" src="" alt="Vista previa" class="preview-image"
+                                    style="max-width: 200px; border-radius: 8px;">
+                            </div>
+
+                            <!-- Mantén el input oculto para compatibilidad -->
+                            <input type="file" id="firmaDigital" name="firma_digital" style="display: none;">
+                            <div id="imagePreview" class="image-preview mt-2 d-none">
+                                <img id="previewImg" src="" alt="Vista previa" class="preview-image"
+                                    style="max-width: 200px; border-radius: 8px;">
+                            </div>
+
+
+                            <!-- Checkbox de tratamiento de datos -->
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="aceptoDatos" name="acepto_datos"
+                                    required>
+                                <label class="form-check-label" for="aceptoDatos">
+                                    Autorizo el tratamiento de mis datos personales de acuerdo con la
+                                    <a href="Tratamiento_de_datos.pdf" target="_blank">Política de Tratamiento de
+                                        Datos</a>.
+                                </label>
+                                <div class="invalid-feedback">
+                                    Debe aceptar el tratamiento de datos personales para continuar.
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+                                    <i class="fas fa-check me-2"></i>Registrar Asistencia
+                                </button>
+                            </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div id="successSection" class="success-section d-none">
+                <div class="success-card">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>¡Asistencia Registrada!</h3>
+                    <p id="successMessage">Su asistencia ha sido registrada exitosamente.</p>
+                    <div class="success-details">
+                        <p><strong>Hora de registro:</strong> <span id="horaRegistro"></span></p>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary" onclick="resetForm()">
+                        <i class="fas fa-plus me-2"></i>Registrar Otra Persona
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <p>&copy; 2025 Sistema de Lista de Asistencia Digital</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <a href="/capacitador.html" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-chalkboard-teacher me-1"></i>Registro de Capacitador
+                    </a>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/admin.html" class="admin-link">
+                        <i class="fas fa-cog me-1"></i>Panel de Administración
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+
+</html>

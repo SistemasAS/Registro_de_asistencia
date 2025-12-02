@@ -1,0 +1,507 @@
+/* Variables CSS para Admin */
+:root {
+    --admin-primary: #2563eb;
+    --admin-primary-dark: #1d4ed8;
+    --admin-secondary: #64748b;
+    --admin-success: #059669;
+    --admin-warning: #d97706;
+    --admin-danger: #dc2626;
+    --admin-info: #0891b2;
+    --admin-light: #f8fafc;
+    --admin-dark: #1e293b;
+    --admin-white: #ffffff;
+    --admin-gray-100: #f1f5f9;
+    --admin-gray-200: #e2e8f0;
+    --admin-gray-300: #cbd5e1;
+    --admin-gray-600: #475569;
+    --admin-gray-800: #1e293b;
+    --admin-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --admin-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --admin-border-radius: 0.75rem;
+    --admin-transition: all 0.3s ease;
+}
+
+/* Base Styles */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--admin-light);
+    color: var(--admin-gray-800);
+    line-height: 1.6;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+.loading-overlay .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Login Section */
+.login-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
+}
+
+.login-card {
+    background: var(--admin-white);
+    border-radius: var(--admin-border-radius);
+    padding: 3rem 2rem;
+    box-shadow: var(--admin-shadow-lg);
+    border: none;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-header i {
+    font-size: 3rem;
+    color: var(--admin-primary);
+    margin-bottom: 1rem;
+}
+
+.login-header h2 {
+    color: var(--admin-gray-800);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    color: var(--admin-gray-600);
+    margin-bottom: 0;
+}
+
+/* Admin Dashboard */
+.admin-dashboard {
+    min-height: 100vh;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--admin-white);
+}
+
+/* Stat Cards */
+.stat-card {
+    background: var(--admin-white);
+    border-radius: var(--admin-border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--admin-shadow);
+    border: 1px solid var(--admin-gray-200);
+    display: flex;
+    align-items: center;
+    transition: var(--admin-transition);
+    margin-bottom: 1rem;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--admin-shadow-lg);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: var(--admin-white);
+    font-size: 1.5rem;
+}
+
+.stat-icon.bg-primary {
+    background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
+}
+
+.stat-icon.bg-success {
+    background: linear-gradient(135deg, var(--admin-success) 0%, #047857 100%);
+}
+
+.stat-icon.bg-info {
+    background: linear-gradient(135deg, var(--admin-info) 0%, #0e7490 100%);
+}
+
+.stat-icon.bg-warning {
+    background: linear-gradient(135deg, var(--admin-warning) 0%, #c2410c 100%);
+}
+
+.stat-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--admin-gray-800);
+    margin-bottom: 0.25rem;
+}
+
+.stat-content p {
+    color: var(--admin-gray-600);
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+/* Tabs */
+.nav-tabs {
+    border-bottom: 2px solid var(--admin-gray-200);
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: var(--admin-gray-600);
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    border-radius: var(--admin-border-radius) var(--admin-border-radius) 0 0;
+    transition: var(--admin-transition);
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    color: var(--admin-primary);
+    background-color: var(--admin-gray-100);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--admin-primary);
+    background-color: var(--admin-white);
+    border-color: var(--admin-primary) var(--admin-primary) var(--admin-white);
+    border-width: 0 0 2px 0;
+    font-weight: 600;
+}
+
+/* Cards */
+
+
+/* Forms */
+.form-label {
+    font-weight: 600;
+    color: var(--admin-gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 2px solid var(--admin-gray-200);
+    border-radius: var(--admin-border-radius);
+    padding: 0.75rem 1rem;
+    transition: var(--admin-transition);
+}
+
+.form-control:focus {
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+}
+
+.form-check-input:checked {
+    background-color: var(--admin-primary);
+    border-color: var(--admin-primary);
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--admin-border-radius);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: var(--admin-transition);
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
+    color: var(--admin-white);
+    box-shadow: var(--admin-shadow);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--admin-primary-dark) 0%, #1e40af 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--admin-shadow-lg);
+    color: var(--admin-white);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--admin-success) 0%, #047857 100%);
+    color: var(--admin-white);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    color: var(--admin-white);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--admin-primary);
+    color: var(--admin-primary);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--admin-primary);
+    color: var(--admin-white);
+}
+
+.btn:disabled {
+    background: var(--admin-gray-300);
+    color: var(--admin-gray-600);
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Tables */
+.table {
+    background: var(--admin-white);
+}
+
+.table th {
+    background-color: var(--admin-gray-100);
+    border-bottom: 2px solid var(--admin-gray-200);
+    font-weight: 600;
+    color: var(--admin-gray-800);
+    padding: 1rem 0.75rem;
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--admin-gray-200);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--admin-gray-100);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--admin-gray-100);
+}
+
+/* Charts */
+#cargoChart, #rutaChart {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Alerts */
+.alert {
+    border-radius: var(--admin-border-radius);
+    border: none;
+    font-weight: 500;
+}
+
+.alert-danger {
+    background-color: #fef2f2;
+    color: var(--admin-danger);
+    border-left: 4px solid var(--admin-danger);
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: var(--admin-success);
+    border-left: 4px solid var(--admin-success);
+}
+
+.alert-warning {
+    background-color: #fefce8;
+    color: var(--admin-warning);
+    border-left: 4px solid var(--admin-warning);
+}
+
+.alert-info {
+    background-color: #f0f9ff;
+    color: var(--admin-info);
+    border-left: 4px solid var(--admin-info);
+}
+
+/* Dropdown */
+.dropdown-menu {
+    border: 1px solid var(--admin-gray-200);
+    border-radius: var(--admin-border-radius);
+    box-shadow: var(--admin-shadow-lg);
+}
+
+.dropdown-item {
+    padding: 0.75rem 1rem;
+    transition: var(--admin-transition);
+}
+
+.dropdown-item:hover {
+    background-color: var(--admin-gray-100);
+    color: var(--admin-gray-800);
+}
+
+/* Vista previa de imagen en formularios */
+.image-preview {
+    position: relative;
+    display: inline-block;
+    max-width: 250px;   /* tamaño máximo del contenedor */
+    margin-top: 10px;
+}
+
+.preview-image {
+    max-width: 100%;    /* que nunca se salga del contenedor */
+    max-height: 200px;  /* limitar altura */
+    border-radius: 8px;
+    border: 1px solid var(--admin-gray-300);
+    box-shadow: var(--admin-shadow);
+    display: block;
+}
+
+/* Botón de eliminar dentro de la vista previa */
+.image-preview .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border-radius: 50%;
+    padding: 4px 7px;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-card {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .stat-content h3 {
+        font-size: 1.5rem;
+    }
+    
+    .nav-tabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .stat-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .nav-tabs .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Utility Classes */
+.d-none {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-end {
+    text-align: end !important;
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.me-1 {
+    margin-right: 0.25rem !important;
+}
+
+.me-2 {
+    margin-right: 0.5rem !important;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.mt-3 {
+    margin-top: 1rem !important;
+}
+
+.gap-2 {
+    gap: 0.5rem !important;
+}
+
