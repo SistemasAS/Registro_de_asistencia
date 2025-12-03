@@ -3,7 +3,6 @@ import sys
 from datetime import date, time, datetime
 from zoneinfo import ZoneInfo
 
-# DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory
@@ -30,21 +29,34 @@ def current_time_co():
 # --- App Flask ---
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-# Habilitar CORS para todas las rutas
 CORS(app)
 
 # Registrar blueprints
 app.register_blueprint(asistencia_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/admin')
 
-# Configuración de base de datos
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+# ✅ NUEVA CONFIGURACIÓN DE BASE DE DATOS
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # PostgreSQL en producción (Supabase)
+    # Supabase usa 'postgres://' pero SQLAlchemy necesita 'postgresql://'
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+    print("✅ Usando PostgreSQL (Supabase)")
+else:
+    # SQLite para desarrollo local
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+    print("✅ Usando SQLite (desarrollo local)")
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-# Hacer disponibles las funciones de timezone para otros módulos
+# Hacer disponibles las funciones de timezone
 app.config['NOW_CO'] = now_co
 app.config['TODAY_CO'] = today_co
 app.config['CURRENT_TIME_CO'] = current_time_co
@@ -52,22 +64,20 @@ app.config['COLOMBIA_TZ'] = COLOMBIA_TZ
 
 def crear_datos_iniciales():
     """Crea datos iniciales si no existen (usando fecha en Colombia)."""
-    # Crear administrador por defecto
     admin_existente = Administrador.query.filter_by(usuario='admin').first()
     if not admin_existente:
         admin = Administrador(usuario='admin')
-        admin.set_password('admin123')  # Contraseña por defecto
+        admin.set_password('admin123')
         db.session.add(admin)
     
-    # Crear configuración por defecto
     config_existente = Configuracion.query.first()
     if not config_existente:
         config = Configuracion(
             nombre_capacitacion='Capacitación de Seguridad',
             ciudad_capacitacion='Ciudad Capacitación',
             modalidad_capacitacion='Virtual / Presencial',
-            hora_inicio=time(13, 0),  # 1:00 PM Colombia (naïve time)
-            hora_fin=time(15, 30),    # 3:30 PM Colombia (naïve time)
+            hora_inicio=time(13, 0),
+            hora_fin=time(15, 30),
             fecha_capacitacion=today_co(),
             asesor_externo=' ',
             nombre_empresa='AUTOSNACK SAS',
@@ -100,7 +110,6 @@ def serve(path):
 
 
 if __name__ == '__main__':
-    # En Render usa puerto 10000 por defecto y no debug
     port = int(os.environ.get('PORT', 5001))
     debug = os.environ.get('FLASK_ENV') != 'production'
     app.run(host='0.0.0.0', port=port, debug=debug)
