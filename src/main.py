@@ -37,7 +37,7 @@ CORS(app)
 app.register_blueprint(asistencia_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/admin')
 
-# ✅ NUEVA CONFIGURACIÓN DE BASE DE DATOS
+# ✅ CONFIGURACIÓN MEJORADA DE BASE DE DATOS
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 if DATABASE_URL:
@@ -46,7 +46,29 @@ if DATABASE_URL:
     if DATABASE_URL.startswith('postgres://'):
         DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
     
+    # Agregar parámetros de conexión para mejorar compatibilidad
+    if '?' not in DATABASE_URL:
+        DATABASE_URL += '?'
+    else:
+        DATABASE_URL += '&'
+    
+    # Agregar opciones de conexión
+    DATABASE_URL += 'connect_timeout=10'
+    
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,  # Verifica conexiones antes de usarlas
+        'pool_recycle': 300,    # Recicla conexiones cada 5 minutos
+        'pool_size': 10,        # Tamaño del pool de conexiones
+        'max_overflow': 20,     # Conexiones adicionales permitidas
+        'connect_args': {
+            'connect_timeout': 10,
+            'keepalives': 1,
+            'keepalives_idle': 30,
+            'keepalives_interval': 10,
+            'keepalives_count': 5,
+        }
+    }
     print("✅ Usando PostgreSQL (Supabase)")
 else:
     # SQLite para desarrollo local
@@ -64,33 +86,45 @@ app.config['COLOMBIA_TZ'] = COLOMBIA_TZ
 
 def crear_datos_iniciales():
     """Crea datos iniciales si no existen (usando fecha en Colombia)."""
-    admin_existente = Administrador.query.filter_by(usuario='admin').first()
-    if not admin_existente:
-        admin = Administrador(usuario='admin')
-        admin.set_password('admin123')
-        db.session.add(admin)
-    
-    config_existente = Configuracion.query.first()
-    if not config_existente:
-        config = Configuracion(
-            nombre_capacitacion='Capacitación de Seguridad',
-            ciudad_capacitacion='Ciudad Capacitación',
-            modalidad_capacitacion='Virtual / Presencial',
-            hora_inicio=time(13, 0),
-            hora_fin=time(15, 30),
-            fecha_capacitacion=today_co(),
-            asesor_externo=' ',
-            nombre_empresa='AUTOSNACK SAS',
-            direccion_empresa='Av. Boyacá #95 - 51',
-            telefono_empresa='(601) 743 3904'
-        )
-        db.session.add(config)
-    
-    db.session.commit()
+    try:
+        admin_existente = Administrador.query.filter_by(usuario='admin').first()
+        if not admin_existente:
+            admin = Administrador(usuario='admin')
+            admin.set_password('admin123')
+            db.session.add(admin)
+        
+        config_existente = Configuracion.query.first()
+        if not config_existente:
+            config = Configuracion(
+                nombre_capacitacion='Capacitación de Seguridad',
+                ciudad_capacitacion='Ciudad Capacitación',
+                modalidad_capacitacion='Virtual / Presencial',
+                hora_inicio=time(13, 0),
+                hora_fin=time(15, 30),
+                fecha_capacitacion=today_co(),
+                asesor_externo=' ',
+                nombre_empresa='AUTOSNACK SAS',
+                direccion_empresa='Av. Boyacá #95 - 51',
+                telefono_empresa='(601) 743 3904'
+            )
+            db.session.add(config)
+        
+        db.session.commit()
+        print("✅ Datos iniciales creados/verificados correctamente")
+    except Exception as e:
+        print(f"⚠️ Error al crear datos iniciales: {e}")
+        db.session.rollback()
 
-with app.app_context():
-    db.create_all()
-    crear_datos_iniciales()
+# Inicializar base de datos con manejo de errores mejorado
+try:
+    with app.app_context():
+        print("🔄 Intentando conectar a la base de datos...")
+        db.create_all()
+        print("✅ Tablas creadas/verificadas correctamente")
+        crear_datos_iniciales()
+except Exception as e:
+    print(f"❌ Error al inicializar la base de datos: {e}")
+    print("⚠️ La aplicación continuará, pero puede que necesites verificar la conexión")
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
